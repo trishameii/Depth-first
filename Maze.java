@@ -70,9 +70,12 @@ import java.util.*;
 
 		// ??? - modify this method
 
-		Stack<MazeNode> stack = new Stack<>();
+	Stack<MazeNode> stack = new Stack<>();
 
         int size = _mazeUI.getMazeSize();
+
+	int goalStateX = _mazeUI.getGoalStateX();
+	int goalStateY = _mazeUI.getGoalStateY();
 
         MazeNode node = _mazeUI.getStartNode();
         _mazeUI.closedListAdd(node);
@@ -83,20 +86,20 @@ import java.util.*;
 		int nodeStateY = _mazeUI.getStartNode().getStateY();
 
         while(!stack.isEmpty()){
-            // check if the recent node is the goal node
             if(_mazeUI.isGoalNode(node))
                 return true;
 
             
-			nodeStateX = node.getStateX();
+	    nodeStateX = node.getStateX();
             nodeStateY = node.getStateY();
+
+            float gValue = node.getGValue()+1;
 			
-			MazeNode down = new MazeNode(nodeStateX,nodeStateY+1,node,node.getGValue()+1,node.computeHValue(nodeStateX,nodeStateY+1,_mazeUI.getGoalStateX(),_mazeUI.getGoalStateY()));
-            MazeNode right = new MazeNode(nodeStateX+1,nodeStateY,node,node.getGValue()+1,node.computeHValue(nodeStateX+1,nodeStateY,_mazeUI.getGoalStateX(),_mazeUI.getGoalStateY()));
-            MazeNode up = new MazeNode(nodeStateX,nodeStateY-1,node,node.getGValue()+1,node.computeHValue(nodeStateX,nodeStateY-1,_mazeUI.getGoalStateX(),_mazeUI.getGoalStateY()));
-            MazeNode left = new MazeNode(nodeStateX-1,nodeStateY,node,node.getGValue()+1,node.computeHValue(nodeStateX-1,nodeStateY,_mazeUI.getGoalStateX(),_mazeUI.getGoalStateY()));
+	    MazeNode down = new MazeNode(nodeStateX,nodeStateY+1,node,gValue,node.computeHValue(nodeStateX,nodeStateY+1,goalStateX,goalStateY));
+            MazeNode right = new MazeNode(nodeStateX+1,nodeStateY,node,gValue,node.computeHValue(nodeStateX+1,nodeStateY,goalStateX,goalStateY));
+            MazeNode up = new MazeNode(nodeStateX,nodeStateY-1,node,gValue,node.computeHValue(nodeStateX,nodeStateY-1,goalStateX,goalStateY));
+            MazeNode left = new MazeNode(nodeStateX-1,nodeStateY,node,gValue,node.computeHValue(nodeStateX-1,nodeStateY,goalStateX,goalStateY));
                 
-            // evaluate the validy in the order of the ff direction (down, right, up, left)
             if(!_mazeUI.hasBarricade(nodeStateX,nodeStateY,nodeStateX,nodeStateY+1) && (nodeStateX>=0 && nodeStateX<size) && (nodeStateY+1>=0 && nodeStateY+1<size) && !_mazeUI.closedListContains(down)){
                 nodeStateY = nodeStateY+1;
                 _mazeUI.closedListAdd(down);
@@ -127,11 +130,10 @@ import java.util.*;
             }
             else{
                 stack.pop();
-				node = node.getParent();
+                node = node.getParent();
             }
         }
-
-		return false;
+          return false;
 	}
 
 
